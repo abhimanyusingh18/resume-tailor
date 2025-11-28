@@ -1,0 +1,5 @@
+# https://tailor.abhimanyu.live/sitemap.xml
+User-agent: *
+Allow: /
+
+Sitemap: https://tailor.abhimanyu.live/sitemap.xml
