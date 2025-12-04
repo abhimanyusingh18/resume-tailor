@@ -67,10 +67,10 @@ export async function POST(req) {
             }
         }
 
-        // Construct Prompt for LaTeX generation
+        // Construct Prompt for HTML generation
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `
-      You are an expert resume writer and LaTeX specialist.
+      You are an expert resume writer and HTML/CSS specialist.
       
       Here is a candidate's resume text:
       "${resumeText}"
@@ -78,18 +78,23 @@ export async function POST(req) {
       Here is the job description they are applying for:
       "${jobDescription}"
       
-      Please rewrite the resume to better match the job description and output it as a complete, ready-to-compile LaTeX document.
+      Please rewrite the resume to better match the job description and output it as a complete, ready-to-use HTML document.
       
       Requirements:
-      - Use the article or resume document class
+      - Create a clean, professional, ATS-friendly resume
+      - Use semantic HTML5 structure
+      - Include ALL styles inline using the style attribute (no external CSS or <style> tags)
       - Highlight relevant skills and experiences that match the job description
       - Use professional and impactful language
       - Maintain the truthfulness of the original resume but emphasize the parts that matter for this job
-      - Include proper LaTeX formatting (sections, itemize/enumerate, bold, italic, etc.)
-      - Make it clean, modern, and ATS-friendly
-      - Output ONLY the raw LaTeX code, nothing else
-      - Do NOT wrap the code in markdown code fences (no \`\`\`latex or \`\`\`)
-      - Start directly with \\\\documentclass and end with \\\\end{document}
+      - Use a modern, clean design with proper typography
+      - Make the resume look polished and professional when rendered
+      - Use appropriate spacing, margins, and font sizes
+      - Output ONLY the HTML code for the resume content (no <!DOCTYPE>, <html>, <head>, or <body> tags)
+      - Start directly with a main container div and end with its closing tag
+      - Use a white or light background and dark text for good contrast
+      - Keep the layout single-column and print-friendly
+      - Use colors sparingly and professionally (e.g., for section headers)
     `;
 
         // Generate Content
@@ -98,7 +103,7 @@ export async function POST(req) {
         let text = response.text();
 
         // Strip markdown code fences if Gemini added them anyway
-        text = text.replace(/^```latex\n?/i, '').replace(/\n?```$/i, '').trim();
+        text = text.replace(/^```html\n?/i, '').replace(/\n?```$/i, '').trim();
 
         return NextResponse.json({ result: text });
     } catch (error) {

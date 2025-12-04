@@ -10,6 +10,10 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.12.1",
+    "jspdf": "^3.0.4",
+    "jspdf-html2canvas": "^1.5.2",
     "next": "16.0.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",

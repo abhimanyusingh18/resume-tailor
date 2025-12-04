@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+
 export default function Home() {
     const [file, setFile] = useState(null);
     const [manualResumeText, setManualResumeText] = useState('');
@@ -187,32 +188,30 @@ export default function Home() {
 
                 {/* Output Section */}
                 <section className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>LaTeX Result</h2>
+                    <h2 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Resume Preview</h2>
 
                     <div
+                        id="resume-preview"
                         style={{
                             flex: 1,
-                            background: 'rgba(0,0,0,0.2)',
+                            background: '#ffffff',
                             borderRadius: '8px',
-                            padding: '1rem',
+                            padding: '2rem',
                             overflowY: 'auto',
                             maxHeight: 'calc(100vh - 280px)',
-                            whiteSpace: 'pre-wrap',
-                            color: '#d1d5db',
-                            fontFamily: 'monospace',
-                            lineHeight: '1.5',
-                            fontSize: '0.75rem'
+                            color: '#000000',
+                            lineHeight: '1.6'
                         }}
                     >
                         {loading ? (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--secondary)', fontSize: '0.9rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666', fontSize: '0.9rem' }}>
                                 Processing your resume...
                             </div>
                         ) : result ? (
-                            result
+                            <div dangerouslySetInnerHTML={{ __html: result }} />
                         ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>
-                                Your tailored resume (LaTeX) will appear here.
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666', fontStyle: 'italic', fontSize: '0.9rem' }}>
+                                Your tailored resume will appear here.
                             </div>
                         )}
                     </div>
@@ -221,26 +220,51 @@ export default function Home() {
                         <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                             <button
                                 className="btn-primary"
-                                style={{ background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-                                onClick={() => navigator.clipboard.writeText(result)}
-                            >
-                                Copy LaTeX Code
-                            </button>
-                            <a
-                                href="https://www.overleaf.com/project"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn-primary"
-                                style={{
-                                    background: 'linear-gradient(135deg, #19A974 0%, #157A52 100%)',
-                                    textDecoration: 'none',
-                                    display: 'inline-block',
-                                    padding: '0.5rem 1rem',
-                                    fontSize: '0.85rem'
+                                style={{ padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}
+                                onClick={async () => {
+                                    const element = document.getElementById('resume-preview');
+
+                                    // Dynamically import html2pdf
+                                    const html2pdf = (await import('html2pdf.js')).default;
+
+                                    // Save original styles
+                                    const originalMaxHeight = element.style.maxHeight;
+                                    const originalOverflow = element.style.overflow;
+
+                                    // Temporarily expand element to full height
+                                    element.style.maxHeight = 'none';
+                                    element.style.overflow = 'visible';
+
+                                    // Configure html2pdf options
+                                    const opt = {
+                                        margin: 10,
+                                        filename: 'tailored-resume.pdf',
+                                        image: { type: 'jpeg', quality: 0.98 },
+                                        html2canvas: {
+                                            scale: 2,
+                                            useCORS: true,
+                                            letterRendering: true,
+                                            windowWidth: element.scrollWidth
+                                        },
+                                        jsPDF: {
+                                            unit: 'mm',
+                                            format: 'a4',
+                                            orientation: 'portrait'
+                                        }
+                                    };
+
+                                    // Generate PDF and restore styles
+                                    try {
+                                        await html2pdf().set(opt).from(element).save();
+                                    } finally {
+                                        // Restore original styles
+                                        element.style.maxHeight = originalMaxHeight;
+                                        element.style.overflow = originalOverflow;
+                                    }
                                 }}
                             >
-                                Open Overleaf
-                            </a>
+                                📥 Download PDF
+                            </button>
                         </div>
                     )}
                 </section>
