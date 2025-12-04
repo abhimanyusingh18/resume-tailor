@@ -227,39 +227,51 @@ export default function Home() {
                                     // Dynamically import html2pdf
                                     const html2pdf = (await import('html2pdf.js')).default;
 
-                                    // Save original styles
-                                    const originalMaxHeight = element.style.maxHeight;
-                                    const originalOverflow = element.style.overflow;
+                                    // Clone the element
+                                    const clone = element.cloneNode(true);
 
-                                    // Temporarily expand element to full height
-                                    element.style.maxHeight = 'none';
-                                    element.style.overflow = 'visible';
+                                    // Create a container for the clone to ensure it renders correctly off-screen
+                                    const container = document.createElement('div');
+                                    container.style.position = 'absolute';
+                                    container.style.left = '-9999px';
+                                    container.style.top = '0';
+                                    container.style.width = '794px'; // Exact A4 width at 96DPI
+                                    document.body.appendChild(container);
+
+                                    // Apply styles to clone to ensure full content is captured
+                                    clone.style.width = '100%';
+                                    clone.style.height = 'auto';
+                                    clone.style.maxHeight = 'none';
+                                    clone.style.overflow = 'visible';
+                                    clone.style.boxSizing = 'border-box'; // Ensure padding is included in width
+
+                                    // Append clone to container
+                                    container.appendChild(clone);
 
                                     // Configure html2pdf options
                                     const opt = {
-                                        margin: 10,
+                                        margin: [5, 10, 5, 10], // Reduced top/bottom margins
                                         filename: 'tailored-resume.pdf',
                                         image: { type: 'jpeg', quality: 0.98 },
                                         html2canvas: {
                                             scale: 2,
                                             useCORS: true,
                                             letterRendering: true,
-                                            windowWidth: element.scrollWidth
+                                            windowWidth: 794 // Match container width
                                         },
                                         jsPDF: {
                                             unit: 'mm',
                                             format: 'a4',
                                             orientation: 'portrait'
-                                        }
+                                        },
+                                        pagebreak: { mode: ['css', 'legacy'] } // Removed 'avoid-all' to reduce gaps
                                     };
 
-                                    // Generate PDF and restore styles
+                                    // Generate PDF and cleanup
                                     try {
-                                        await html2pdf().set(opt).from(element).save();
+                                        await html2pdf().set(opt).from(clone).save();
                                     } finally {
-                                        // Restore original styles
-                                        element.style.maxHeight = originalMaxHeight;
-                                        element.style.overflow = originalOverflow;
+                                        document.body.removeChild(container);
                                     }
                                 }}
                             >
