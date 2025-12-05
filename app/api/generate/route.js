@@ -70,7 +70,7 @@ export async function POST(req) {
         // Construct Prompt for HTML generation
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const prompt = `
-      You are an expert resume writer and HTML/CSS specialist.
+      You are an expert resume writer and HTML specialist.
       
       Here is a candidate's resume text:
       "${resumeText}"
@@ -78,37 +78,28 @@ export async function POST(req) {
       Here is the job description they are applying for:
       "${jobDescription}"
       
-      Please rewrite the resume to better match the job description and output it as a complete, ready-to-use HTML document.
+      Please rewrite the resume to better match the job description and output it as HTML content.
       
-      Requirements:
-      - **Design Style**: "Classic Professional" (similar to Jake's Resume or Deedy). Use a serif font ('Times New Roman', Times, serif).
-      - **Layout**: Single column, clean, high information density.
+      **CRITICAL REQUIREMENTS:**
+      1. **NO GLOBAL STYLES**: Do NOT use <style> tags, <link> tags, or any global CSS. Use ONLY inline styles.
+      2. **NO WRAPPER TAGS**: Do NOT include <html>, <head>, or <body> tags. Output only the content divs.
+      3. **Color Scheme**: Use white text (color: #ffffff or #ededed) on transparent/dark background to match the dark theme.
+      4. **Font**: Use font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.6;
       
-      **Specific Styling Instructions (Apply Inline):**
-      1.  **Global**: font-family: 'Times New Roman', Times, serif; line-height: 1.4; font-size: 11pt;
-      2.  **Header**: 
-          -   Name: text-align: center; font-size: 24pt; margin-bottom: 5px; font-weight: normal;
-          -   Contact Info: text-align: center; font-size: 10pt; margin-bottom: 15px; (Separate items with | surrounded by spaces).
-      3.  **Section Headings**: 
-          -   text-transform: uppercase; border-bottom: 1px solid currentColor; font-size: 12pt; font-weight: bold; margin-top: 15px; margin-bottom: 8px; padding-bottom: 2px;
-      4.  **Experience/Project Items**:
-          -   Use a Flexbox row for the top line: <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          -   **Left Side**: <strong>Role Title</strong> (or Project Name)
-          -   **Right Side**: <span>Date Range</span>
-          -   *Second Line (if applicable)*: <div style="display: flex; justify-content: space-between; font-style: italic;"> -> **Left**: Company Name, **Right**: Location.
-      5.  **Lists**: 
-          -   margin-top: 2px; margin-bottom: 8px; padding-left: 20px;
-          -   List items (li): margin-bottom: 2px;
-      
-      **Critical Page Break Rules:**
-      -   Add page-break-inside: avoid; break-inside: avoid; to list items (li) and the container of the Role/Company/Date block.
-      -   Ensure headings (h2) are kept with their first few items.
+      **Specific Styling (ALL INLINE):**
+      - **Header Name**: style="text-align: center; font-size: 24pt; margin-bottom: 5px; font-weight: normal; color: #ffffff;"
+      - **Contact Info**: style="text-align: center; font-size: 10pt; margin-bottom: 15px; color: #ededed;"
+      - **Section Headings**: style="text-transform: uppercase; border-bottom: 1px solid #ffffff; font-size: 12pt; font-weight: bold; margin-top: 15px; margin-bottom: 8px; padding-bottom: 2px; color: #ffffff;"
+      - **Body Text**: style="color: #ededed; margin-bottom: 8px;"
+      - **Experience Items**: Use flexbox for title/date: style="display: flex; justify-content: space-between; align-items: baseline; color: #ffffff; margin-bottom: 5px;"
+      - **Lists**: style="margin-top: 2px; margin-bottom: 8px; padding-left: 20px; color: #ededed;"
+      - **List Items**: style="margin-bottom: 2px; color: #ededed;"
       
       **Content Guidelines:**
-      -   Highlight relevant skills for the job description.
-      -   Use strong action verbs.
-      -   Output ONLY valid HTML inside the main container.
-      -   Ensure box-sizing: border-box and max-width: 100% on all elements.
+      - Highlight relevant skills for the job description.
+      - Use strong action verbs.
+      - Keep it concise and high information density.
+      - Output ONLY the HTML content, no markdown code fences.
     `;
 
         // Generate Content

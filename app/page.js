@@ -75,11 +75,26 @@ export default function Home() {
 
             const data = await response.json();
 
+
             if (!response.ok) {
                 throw new Error(data.error || 'Something went wrong');
             }
 
-            setResult(data.result);
+            // Sanitize the HTML to remove global <style> and <link> tags
+            let sanitizedHTML = data.result;
+
+            // Remove <style> tags and their content
+            sanitizedHTML = sanitizedHTML.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+
+            // Remove <link> tags (stylesheets)
+            sanitizedHTML = sanitizedHTML.replace(/<link[^>]*>/gi, '');
+
+            // Remove any html, head, or body tags that might be wrapping the content
+            sanitizedHTML = sanitizedHTML.replace(/<\/?html[^>]*>/gi, '');
+            sanitizedHTML = sanitizedHTML.replace(/<\/?head[^>]*>/gi, '');
+            sanitizedHTML = sanitizedHTML.replace(/<\/?body[^>]*>/gi, '');
+
+            setResult(sanitizedHTML.trim());
         } catch (err) {
             setError(err.message);
         } finally {
@@ -236,10 +251,15 @@ export default function Home() {
                                     clone.style.background = '#ffffff';
                                     clone.style.color = '#000000';
 
-                                    // Ensure all children inherit black color (for currentColor borders)
+                                    // Ensure all children inherit black color and borders
                                     const allElements = clone.getElementsByTagName('*');
                                     for (let i = 0; i < allElements.length; i++) {
                                         allElements[i].style.color = '#000000';
+                                        // Convert white borders to black
+                                        const borderColor = window.getComputedStyle(allElements[i]).borderColor;
+                                        if (borderColor && (borderColor.includes('255, 255, 255') || borderColor.includes('#ffffff'))) {
+                                            allElements[i].style.borderColor = '#000000';
+                                        }
                                     }
 
                                     // Create a container for the clone to ensure it renders correctly off-screen
