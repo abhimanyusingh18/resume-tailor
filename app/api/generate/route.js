@@ -85,12 +85,12 @@ export async function POST(req) {
       - **Layout**: Single column, clean, high information density.
       
       **Specific Styling Instructions (Apply Inline):**
-      1.  **Global**: font-family: 'Times New Roman', Times, serif; color: #333; line-height: 1.4; font-size: 11pt;
+      1.  **Global**: font-family: 'Times New Roman', Times, serif; line-height: 1.4; font-size: 11pt;
       2.  **Header**: 
           -   Name: text-align: center; font-size: 24pt; margin-bottom: 5px; font-weight: normal;
           -   Contact Info: text-align: center; font-size: 10pt; margin-bottom: 15px; (Separate items with | surrounded by spaces).
       3.  **Section Headings**: 
-          -   text-transform: uppercase; border-bottom: 1px solid #333; font-size: 12pt; font-weight: bold; margin-top: 15px; margin-bottom: 8px; padding-bottom: 2px;
+          -   text-transform: uppercase; border-bottom: 1px solid currentColor; font-size: 12pt; font-weight: bold; margin-top: 15px; margin-bottom: 8px; padding-bottom: 2px;
       4.  **Experience/Project Items**:
           -   Use a Flexbox row for the top line: <div style="display: flex; justify-content: space-between; align-items: baseline;">
           -   **Left Side**: <strong>Role Title</strong> (or Project Name)

@@ -98,7 +98,7 @@ export default function Home() {
                 </p>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+            <div className="main-grid">
                 {/* Input Section */}
                 <section className="glass-panel" style={{ padding: '1.25rem' }}>
                     <h2 style={{ marginBottom: '1rem', fontSize: '1.25rem' }}>Input Details</h2>
@@ -194,23 +194,23 @@ export default function Home() {
                         id="resume-preview"
                         style={{
                             flex: 1,
-                            background: '#ffffff',
+                            background: 'rgba(255, 255, 255, 0.05)', // Dark glass background for preview
                             borderRadius: '8px',
                             padding: '2rem',
                             overflowY: 'auto',
                             maxHeight: 'calc(100vh - 280px)',
-                            color: '#000000',
+                            color: 'var(--foreground)', // White text for preview
                             lineHeight: '1.6'
                         }}
                     >
                         {loading ? (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666', fontSize: '0.9rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--secondary)', fontSize: '0.9rem' }}>
                                 Processing your resume...
                             </div>
                         ) : result ? (
                             <div dangerouslySetInnerHTML={{ __html: result }} />
                         ) : (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#666', fontStyle: 'italic', fontSize: '0.9rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>
                                 Your tailored resume will appear here.
                             </div>
                         )}
@@ -229,13 +229,26 @@ export default function Home() {
 
                                     // Clone the element
                                     const clone = element.cloneNode(true);
+                                    clone.removeAttribute('id'); // Prevent duplicate ID conflicts
+
+                                    // Force white background and black text for PDF
+                                    clone.style.background = '#ffffff';
+                                    clone.style.color = '#000000';
+
+                                    // Ensure all children inherit black color (for currentColor borders)
+                                    const allElements = clone.getElementsByTagName('*');
+                                    for (let i = 0; i < allElements.length; i++) {
+                                        allElements[i].style.color = '#000000';
+                                    }
 
                                     // Create a container for the clone to ensure it renders correctly off-screen
                                     const container = document.createElement('div');
-                                    container.style.position = 'absolute';
-                                    container.style.left = '-9999px';
-                                    container.style.top = '0';
+                                    container.style.position = 'fixed'; // Fixed to avoid affecting scroll or layout
+                                    container.style.left = '-10000px';
+                                    container.style.top = '-10000px';
+                                    container.style.zIndex = '-9999'; // Ensure it's behind everything
                                     container.style.width = '794px'; // Exact A4 width at 96DPI
+                                    container.style.visibility = 'visible'; // Must be visible for html2canvas to capture it
                                     document.body.appendChild(container);
 
                                     // Apply styles to clone to ensure full content is captured
