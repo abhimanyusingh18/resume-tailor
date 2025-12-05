@@ -198,6 +198,7 @@ export default function Home() {
                             borderRadius: '8px',
                             padding: '2rem',
                             overflowY: 'auto',
+                            overflowX: 'auto', // Allow horizontal scrolling
                             maxHeight: 'calc(100vh - 280px)',
                             color: 'var(--foreground)', // White text for preview
                             lineHeight: '1.6'
