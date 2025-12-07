@@ -113,9 +113,35 @@ export async function POST(req) {
         return NextResponse.json({ result: text });
     } catch (error) {
         console.error("Error generating resume:", error);
+
+        // Extract meaningful error message from Gemini API
+        let errorMessage = "Internal Server Error";
+        let statusCode = 500;
+
+        // Check if it's a Gemini API error with status and errorDetails
+        if (error.status) {
+            statusCode = error.status;
+
+            if (error.status === 429) {
+                errorMessage = "⚠️ Rate Limit Exceeded: You've made too many requests. Please wait a few minutes and try again. For higher limits, consider upgrading your Gemini API plan.";
+                if (error.errorDetails && error.errorDetails.length > 0) {
+                    const retryDelay = error.errorDetails[0]?.retryDelay || "a few minutes";
+                    errorMessage += ` Retry after: ${retryDelay}`;
+                }
+            } else if (error.status === 403) {
+                errorMessage = "🔒 API Key Error: Your Gemini API key is invalid or doesn't have permission. Please check your .env.local file.";
+            } else if (error.status === 400) {
+                errorMessage = "❌ Bad Request: " + (error.message || "Invalid request to Gemini API");
+            } else if (error.statusText) {
+                errorMessage = `${error.statusText}: ${error.message || "Unknown error from Gemini API"}`;
+            }
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
         return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
+            { error: errorMessage },
+            { status: statusCode }
         );
     }
 }

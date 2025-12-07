@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 
 export default function Home() {
@@ -11,6 +11,9 @@ export default function Home() {
     const [result, setResult] = useState('');
     const [error, setError] = useState('');
     const [isDragging, setIsDragging] = useState(false);
+
+    // Guard to prevent duplicate requests
+    const isSubmittingRef = useRef(false);
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -48,6 +51,14 @@ export default function Home() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Prevent duplicate submissions
+        if (isSubmittingRef.current) {
+            console.log('Request already in progress, ignoring duplicate submission');
+            return;
+        }
+
+        isSubmittingRef.current = true;
         setLoading(true);
         setError('');
         setResult('');
@@ -55,6 +66,7 @@ export default function Home() {
         if ((!file && !manualResumeText) || !jobDescription) {
             setError('Please provide your resume (PDF or text) and a job description.');
             setLoading(false);
+            isSubmittingRef.current = false;
             return;
         }
 
@@ -99,6 +111,7 @@ export default function Home() {
             setError(err.message);
         } finally {
             setLoading(false);
+            isSubmittingRef.current = false; // Reset guard
         }
     };
 
@@ -194,7 +207,7 @@ export default function Home() {
                             type="submit"
                             className="btn-primary"
                             disabled={loading}
-                            style={{ marginTop: '0.5rem', padding: '0.65rem 1.25rem', fontSize: '0.95rem' }}
+                            style={{ marginTop: '0.5rem', padding: '0.65rem 1.25rem', fontSize: '0.95rem', cursor: loading ? 'not-allowed' : 'pointer' }}
                         >
                             {loading ? 'Generating...' : 'Generate Tailored Resume'}
                         </button>
